@@ -37,8 +37,10 @@ const MenuItem: React.FC<React.PropsWithChildren<MenuItemProps>> = ({
       scrollLayer.scrollLeft = menuNode.offsetLeft;
     }
   }, [isActive, isMobile, scrollLayerRef]);
+  const Container = StyledMenuItemContainer as unknown as React.ComponentType<React.PropsWithChildren<React.ComponentProps<typeof StyledMenuItemContainer>>>;
+
   return (
-    <StyledMenuItemContainer $isActive={isActive} $variant={variant} ref={menuItemRef}>
+    <Container $isActive={isActive} $variant={variant} ref={menuItemRef}>
       <StyledMenuItem
         {...itemLinkProps}
         $isActive={isActive}
@@ -49,7 +51,7 @@ const MenuItem: React.FC<React.PropsWithChildren<MenuItemProps>> = ({
       >
         {children}
       </StyledMenuItem>
-    </StyledMenuItemContainer>
+    </Container>
   );
 };
 

@@ -17,6 +17,8 @@ const getTextColor = ({ eventStatus, useDark }: getTextColorProps): keyof Colors
   return useDark ? "textSubtle" : (lightColors.textSubtle as keyof Colors);
 };
 
+const StyledTimelineEvent = TimelineEvent as unknown as React.ComponentType<React.PropsWithChildren<{ $useDark: boolean }>>;
+
 const Timeline: React.FC<React.PropsWithChildren<TimelineProps>> = ({ events, useDark = true }) => {
   return (
     <TimelineContainer>
@@ -25,7 +27,7 @@ const Timeline: React.FC<React.PropsWithChildren<TimelineProps>> = ({ events, us
         const isLive = status === "live";
         const isPast = status === "past";
         return (
-          <TimelineEvent key={text} $useDark={useDark}>
+          <StyledTimelineEvent key={text} $useDark={useDark}>
             <Flex mr="10px" alignItems="center">
               {isUpcoming && <CircleOutlineIcon color={useDark ? "textDisabled" : lightColors.textDisabled} />}
               {isLive && <LogoIcon />}
@@ -42,7 +44,7 @@ const Timeline: React.FC<React.PropsWithChildren<TimelineProps>> = ({ events, us
             {infoText && (
               <InfoTooltip text={infoText} ml="10px" iconColor={useDark ? "textSubtle" : lightColors.textSubtle} />
             )}
-          </TimelineEvent>
+          </StyledTimelineEvent>
         );
       })}
     </TimelineContainer>

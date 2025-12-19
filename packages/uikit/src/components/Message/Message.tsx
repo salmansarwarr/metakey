@@ -15,7 +15,7 @@ const Icons = {
   success: CheckmarkCircleFillIcon,
 };
 
-const MessageContainer = styled.div<MessageProps>`
+const MessageContainer = styled.div<React.PropsWithChildren<MessageProps>>`
   background-color: gray;
   padding: 16px;
   border-radius: 16px;

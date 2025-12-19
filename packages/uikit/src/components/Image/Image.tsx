@@ -5,7 +5,7 @@ import Wrapper from "./Wrapper";
 import { ImageProps } from "./types";
 import Placeholder from "./Placeholder";
 
-const StyledImage = styled.img`
+const StyledImage = styled.img<React.ImgHTMLAttributes<HTMLImageElement>>`
   height: 100%;
   left: 0;
   position: absolute;

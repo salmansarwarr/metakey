@@ -38,10 +38,18 @@ const SubMenuItems: React.FC<React.PropsWithChildren<SubMenuItemsProps>> = ({
   useEffect(() => {
     layerController();
   }, [layerController]);
+
+  const LeftMaskLayerC = LeftMaskLayer as unknown as React.ForwardRefExoticComponent<
+    React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> & React.RefAttributes<HTMLDivElement>
+  >;
+  const RightMaskLayerC = RightMaskLayer as unknown as React.ForwardRefExoticComponent<
+    React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> & React.RefAttributes<HTMLDivElement>
+  >;
+
   return (
     <SubMenuItemWrapper $isMobileOnly={isMobileOnly} {...props}>
       {isMobile && (
-        <LeftMaskLayer
+        <LeftMaskLayerC
           ref={chevronLeftRef}
           onClick={() => {
             if (!scrollLayerRef.current) return;
@@ -49,10 +57,10 @@ const SubMenuItems: React.FC<React.PropsWithChildren<SubMenuItemsProps>> = ({
           }}
         >
           <ChevronLeftIcon />
-        </LeftMaskLayer>
+        </LeftMaskLayerC>
       )}
       {isMobile && (
-        <RightMaskLayer
+        <RightMaskLayerC
           ref={chevronRightRef}
           onClick={() => {
             if (!scrollLayerRef.current) return;
@@ -60,7 +68,7 @@ const SubMenuItems: React.FC<React.PropsWithChildren<SubMenuItemsProps>> = ({
           }}
         >
           <ChevronRightIcon />
-        </RightMaskLayer>
+        </RightMaskLayerC>
       )}
       <StyledSubMenuItems
         justifyContent={[isMobileOnly ? "flex-end" : "start", null, "center"]}
