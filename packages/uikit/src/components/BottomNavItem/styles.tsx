@@ -1,7 +1,8 @@
 import styled from "styled-components";
+import { ButtonHTMLAttributes } from "react";
 import { Text } from "../Text";
 
-export const StyledBottomNavItem = styled.button`
+export const StyledBottomNavItem = styled.button<ButtonHTMLAttributes<HTMLButtonElement>>`
   display: block;
   border: 0;
   background: transparent;

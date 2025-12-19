@@ -18,7 +18,7 @@ const getBottom = ({ position }: PositionProps) => {
   return "auto";
 };
 
-const DropdownContent = styled.div<{ position: Position }>`
+const DropdownContent = styled.div<{ position: Position; children?: React.ReactNode }>`
   width: max-content;
   display: flex;
   flex-direction: column;
@@ -39,7 +39,7 @@ const DropdownContent = styled.div<{ position: Position }>`
   pointer-events: none;
 `;
 
-const Container = styled.div<{ $scrolling: boolean }>`
+const Container = styled.div<{ $scrolling: boolean; children?: React.ReactNode }>`
   position: relative;
   ${({ $scrolling }) =>
     !$scrolling &&

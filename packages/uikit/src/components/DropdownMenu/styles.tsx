@@ -1,4 +1,5 @@
 import styled, { DefaultTheme } from "styled-components";
+import { HTMLAttributes } from "react";
 import { Colors } from "../../theme";
 import { Text } from "../Text";
 import { StyledDropdownMenuItemProps } from "./types";
@@ -44,7 +45,7 @@ export const DropdownMenuItem = styled.button<StyledDropdownMenuItemProps & { $i
   }
 `;
 
-export const StyledDropdownMenuItemContainer = styled.div`
+export const StyledDropdownMenuItemContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
   &:first-child > ${DropdownMenuItem} {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -63,7 +64,7 @@ export const DropdownMenuDivider = styled.hr`
   margin: 4px 0;
 `;
 
-export const StyledDropdownMenu = styled.div<{ $isOpen: boolean; $isBottomNav: boolean }>`
+export const StyledDropdownMenu = styled.div<{ $isOpen: boolean; $isBottomNav: boolean } & HTMLAttributes<HTMLDivElement> & { ref?: any }>`
   background-color: ${({ theme }) => theme.card.background};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-radius: 16px;

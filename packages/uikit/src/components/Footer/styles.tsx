@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { HTMLAttributes } from "react";
 import { darkColors } from "../../theme/colors";
 import { Box, Flex } from "../Box";
 import SocialLinks from "./Components/SocialLinks";
@@ -7,7 +8,7 @@ export const StyledFooter = styled(Flex)`
   background: ${darkColors.backgroundAlt};
 `;
 
-export const StyledList = styled.ul`
+export const StyledList = styled.ul<HTMLAttributes<HTMLUListElement>>`
   list-style: none;
   margin-bottom: 40px;
 
@@ -16,7 +17,7 @@ export const StyledList = styled.ul`
   }
 `;
 
-export const StyledListItem = styled.li`
+export const StyledListItem = styled.li<HTMLAttributes<HTMLLIElement>>`
   font-size: 16px;
   margin-bottom: 8px;
   text-transform: capitalize;

@@ -1,9 +1,9 @@
-import { memo, useCallback, useState, useMemo } from "react";
+import { memo, useCallback, useState, useMemo, HTMLAttributes } from "react";
 import styled from "styled-components";
 import { bnb2CakeImages, cake2BnbImages } from "./constant";
 import { SequencePlayer } from "./SequencePlayer";
 
-export const CoinSwitcherWrapper = styled.div`
+export const CoinSwitcherWrapper = styled.div<HTMLAttributes<HTMLDivElement>>`
   position: absolute;
   top: -25px;
   left: -25px;
@@ -20,7 +20,7 @@ export const CoinSwitcherWrapper = styled.div`
   }
 `;
 
-export const SequenceWrapper = styled.div`
+export const SequenceWrapper = styled.div<HTMLAttributes<HTMLDivElement>>`
   position: absolute;
   top: 0;
   left: 0;

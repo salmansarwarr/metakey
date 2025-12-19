@@ -11,6 +11,7 @@ class MyDocument extends Document {
       // eslint-disable-next-line no-param-reassign
       ctx.renderPage = () =>
         originalRenderPage({
+          // @ts-ignore
           enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
         })
 

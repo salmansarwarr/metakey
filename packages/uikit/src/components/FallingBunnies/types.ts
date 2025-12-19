@@ -1,7 +1,10 @@
+import { ReactNode } from "react";
+
 export interface BunnyProps {
   position: number;
   iterations: number;
   duration: number;
+  children?: ReactNode;
 }
 
 export interface FallingBunniesProps {

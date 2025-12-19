@@ -1,4 +1,4 @@
-import React from "react";
+import React, { AnchorHTMLAttributes } from "react";
 import styled from "styled-components";
 import LogoRound from "../Svg/Icons/LogoRound";
 import Text from "../Text/Text";
@@ -11,7 +11,7 @@ export interface Props {
   showSkeleton?: boolean;
 }
 
-const PriceLink = styled.a`
+const PriceLink = styled.a<AnchorHTMLAttributes<HTMLAnchorElement>>`
   display: flex;
   align-items: center;
   svg {

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { HTMLAttributes } from "react";
 import { Box, Flex } from "../Box";
 
 export const InlineMenuContainer = styled(Box)`
@@ -16,7 +17,7 @@ export const SubMenuContainer = styled(Flex)`
   border: ${({ theme }) => `1px solid ${theme.colors.inputSecondary}`};
 `;
 
-export const ClickableElementContainer = styled.div`
+export const ClickableElementContainer = styled.div<HTMLAttributes<HTMLDivElement> & { ref?: any }>`
   cursor: pointer;
   display: inline-flex;
 `;

@@ -14,6 +14,7 @@ interface ThemedIconLabel {
   variant: AlertProps["variant"];
   theme: DefaultTheme;
   hasDescription: boolean;
+  children?: React.ReactNode;
 }
 
 const getThemeColor = ({ theme, variant = variants.INFO }: ThemedIconLabel) => {
@@ -52,7 +53,7 @@ const IconLabel = styled.div<ThemedIconLabel>`
 `;
 
 const withHandlerSpacing = 32 + 12 + 8; // button size + inner spacing + handler position
-const Details = styled.div<{ hasHandler: boolean }>`
+const Details = styled.div<{ hasHandler: boolean; children?: React.ReactNode }>`
   flex: 1;
   padding-bottom: 12px;
   padding-left: 12px;

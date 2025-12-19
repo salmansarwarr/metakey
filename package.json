@@ -10,7 +10,10 @@
     "@base-org/account": "npm:empty-npm-package@1.0.0"
   },
   "resolutions": {
-    "@base-org/account": "npm:empty-npm-package@1.0.0"
+    "@base-org/account": "npm:empty-npm-package@1.0.0",
+    "@types/react": "18.0.17",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "scripts": {
     "analyze": "ANALYZE=true yarn build",
@@ -131,6 +134,7 @@
     "eslint": "^7.26.0",
     "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-lodash": "^7.4.0",
+    "husky": "^9.1.7",
     "jest": "^27.4.5",
     "lerna": "^4.0.0",
     "lint-staged": "^12.3.4",

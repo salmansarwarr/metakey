@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, ButtonHTMLAttributes } from "react";
 import { FlexProps } from "../../../../components/Box";
 
 export const variants = {
@@ -19,6 +19,7 @@ export interface UserMenuProps extends Omit<FlexProps, "children"> {
   children?: (exposedProps: { isOpen: boolean }) => ReactElement;
 }
 
-export interface UserMenuItemProps {
+export interface UserMenuItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
+  children?: ReactNode;
 }

@@ -1,11 +1,11 @@
 /* eslint-disable react/no-array-index-key */
-import React, { Children, isValidElement, ReactNode } from "react";
+import React, { Children, isValidElement, ReactNode, HTMLAttributes } from "react";
 import styled from "styled-components";
 import { space } from "styled-system";
 import ChevronRightIcon from "../Svg/Icons/ChevronRight";
 import { BreadcrumbsProps } from "./types";
 
-const Separator = styled.div`
+const Separator = styled.div<HTMLAttributes<HTMLDivElement>>`
   align-items: center;
   color: ${({ theme }) => theme.colors.textDisabled};
   display: flex;
