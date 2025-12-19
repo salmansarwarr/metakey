@@ -14,6 +14,7 @@ export const StargateWidget = ({ theme }: { theme: PancakeTheme }) => {
 
   return (
     <Box width="100%">
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx global>{`
         .MuiScopedCssBaseline-root {
           background-color: transparent !important;

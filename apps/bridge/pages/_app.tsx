@@ -14,10 +14,11 @@ declare module 'styled-components' {
 
 const StyledThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
   const { resolvedTheme } = useNextTheme()
+  const ThemeProviderComponent = ThemeProvider as any
   return (
-    <ThemeProvider theme={resolvedTheme === 'dark' ? dark : light} {...props}>
+    <ThemeProviderComponent theme={resolvedTheme === 'dark' ? dark : light} {...props}>
       {props.children}
-    </ThemeProvider>
+    </ThemeProviderComponent>
   )
 }
 
@@ -78,7 +79,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <NextThemeProvider>
         <StyledThemeProvider>
           <ModalProvider>
+            {/* @ts-ignore */}
             <ResetCSS />
+            {/* @ts-ignore */}
             <GlobalStyle />
             {isMounted && (
               <>

@@ -109,7 +109,7 @@ const UserMenuItems = ({ onShowTx }: { onShowTx: () => void }) => {
       <UserMenuDivider />
       {CHAINS_STARGATE.map((chain) => (
         <UserMenuItem key={chain.id} style={{ justifyContent: 'flex-start' }} onClick={() => switchNetwork(chain.id)}>
-          <Image width={24} height={24} src={`/chains/${chain.id}.png`} unoptimized />
+          <Image width={24} height={24} src={`/chains/${chain.id}.png`} alt={chain.name} unoptimized />
           <Text pl="12px">{chain.name}</Text>
         </UserMenuItem>
       ))}
@@ -119,7 +119,7 @@ const UserMenuItems = ({ onShowTx }: { onShowTx: () => void }) => {
 
 async function switchNetwork(chainId: number) {
   const chain = CHAINS_STARGATE.find((c) => c.id === chainId)
-  const provider = window.stargate?.wallet?.ethereum?.signer?.provider?.provider ?? window.ethereum
+  const provider = window.stargate?.wallet?.ethereum?.signer?.provider?.provider ?? (window as any).ethereum
   if (chain && provider) {
     try {
       await provider.request({
@@ -220,7 +220,7 @@ function RecentTransactionsModal({
               {txn.type === 'APPROVE' && (
                 <>
                   {`Approve ${txn?.input?.amount?.currency?.symbol ?? ''}`}{' '}
-                  <Image width={18} height={18} src={`/chains/${txnChain?.chain.id}.png`} unoptimized />
+                  <Image width={18} height={18} src={`/chains/${txnChain?.chain.id}.png`} alt={txnChain?.chain.name || ''} unoptimized />
                 </>
               )}
               {txn.type === 'TRANSFER' && (
@@ -230,6 +230,7 @@ function RecentTransactionsModal({
                     width={18}
                     height={18}
                     src={`/chains/${findChainByStargateId(txn.input.from.chainId)?.chain.id}.png`}
+                    alt={findChainByStargateId(txn.input.from.chainId)?.chain.name || ''}
                     unoptimized
                   />
                   to {txn.input.to.token.symbol}{' '}
@@ -237,6 +238,7 @@ function RecentTransactionsModal({
                     width={18}
                     height={18}
                     src={`/chains/${findChainByStargateId(txn.input.to.chainId)?.chain.id}.png`}
+                    alt={findChainByStargateId(txn.input.to.chainId)?.chain.name || ''}
                     unoptimized
                   />
                 </>
