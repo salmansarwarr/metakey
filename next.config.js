@@ -22,10 +22,6 @@ const config = {
   },
   experimental: {
     scrollRestoration: true,
-    images: {
-      allowFutureImage: true,
-      unoptimized: true,
-    },
   },
   transpilePackages: [
     '@pancakeswap/uikit',
@@ -44,6 +40,7 @@ const config = {
   trailingSlash: true,
   images: {
     domains: ['static-nft.pancakeswap.com'],
+    unoptimized: true,
   },
   async rewrites() {
     return [

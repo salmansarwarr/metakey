@@ -37,3 +37,6 @@ export const modal = createAppKit({
 
 // 4. Export config for use in providers
 export const config = wagmiAdapter.wagmiConfig
+
+// 5. Export chains as alias for networks for backward compatibility
+export const chains = networks

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useTranslation } from '@pancakeswap/localization'
 import { Button, Text, Link, HelpIcon } from '@pancakeswap/uikit'
-import { useSwitchNetwork } from 'wagmi'
+import { useSwitchChain } from 'wagmi'
 import { ChainId } from '@pancakeswap/sdk'
 
 const StyledLink = styled(Link)`
@@ -17,10 +17,10 @@ interface WalletWrongNetworkProps {
 
 const WalletWrongNetwork: React.FC<React.PropsWithChildren<WalletWrongNetworkProps>> = ({ onDismiss }) => {
   const { t } = useTranslation()
-  const { switchNetworkAsync } = useSwitchNetwork()
+  const { switchChainAsync } = useSwitchChain()
 
   const handleSwitchNetwork = async (): Promise<void> => {
-    await switchNetworkAsync(ChainId.BSC)
+    await switchChainAsync({ chainId: ChainId.BSC })
     onDismiss?.()
   }
 
