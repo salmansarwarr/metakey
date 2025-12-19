@@ -19,7 +19,11 @@ const StyledWrapper = styled.div<{ $width: number; $height: number }>`
 `;
 
 const Wrapper = forwardRef<HTMLDivElement, WrapperProps>(({ width, height, ...props }, ref) => {
-  return <StyledWrapper ref={ref} $width={width} $height={height} {...props} />;
+  return (
+    <div ref={ref}>
+      <StyledWrapper $width={width} $height={height} {...props} />
+    </div>
+  );
 });
 
 export default Wrapper;

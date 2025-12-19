@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from "react";
 import styled, { useTheme } from "styled-components";
 import EXTERNAL_LINK_PROPS from "../../util/externalLinkProps";

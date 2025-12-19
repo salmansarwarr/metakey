@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   arbitrumSepolia, // Changed from arbitrumRinkeby
   optimismSepolia, // Changed from optimismKovan

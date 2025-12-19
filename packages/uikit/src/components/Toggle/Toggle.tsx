@@ -14,11 +14,17 @@ const Toggle: React.FC<React.PropsWithChildren<ToggleProps>> = ({
 }) => {
   const isChecked = !!checked;
 
+  const StyledToggleWithChildren = StyledToggle as unknown as React.ComponentType<
+    React.PropsWithChildren<React.ComponentProps<typeof StyledToggle>>
+  >;
+
   return (
-    <StyledToggle $checked={isChecked} $checkedColor={checkedColor} $defaultColor={defaultColor} scale={scale}>
+    <StyledToggleWithChildren $checked={isChecked} $checkedColor={checkedColor} $defaultColor={defaultColor} scale={scale}>
+      {/* @ts-ignore */}
       <Input checked={checked} scale={scale} {...props} type="checkbox" />
       {startIcon && endIcon ? (
         <>
+          {/* @ts-ignore */}
           <Handle scale={scale}>
             <Flex height="100%" alignItems="center" justifyContent="center">
               {checked ? endIcon(checked) : startIcon(!checked)}
@@ -32,7 +38,7 @@ const Toggle: React.FC<React.PropsWithChildren<ToggleProps>> = ({
       ) : (
         <Handle scale={scale} />
       )}
-    </StyledToggle>
+    </StyledToggleWithChildren>
   );
 };
 

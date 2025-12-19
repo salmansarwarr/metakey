@@ -4,15 +4,13 @@ import { StyledTag } from "./StyledTag";
 
 const Tag: React.FC<React.PropsWithChildren<TagProps>> = ({ startIcon, endIcon, children, ...props }) => (
   <StyledTag {...props}>
-    {React.isValidElement(startIcon) &&
-      React.cloneElement(startIcon, {
-        mr: "0.5em",
-      })}
+    {React.isValidElement(startIcon) && (
+      <span style={{ marginRight: "0.5em" }}>{startIcon}</span>
+    )}
     {children}
-    {React.isValidElement(endIcon) &&
-      React.cloneElement(endIcon, {
-        ml: "0.5em",
-      })}
+    {React.isValidElement(endIcon) && (
+      <span style={{ marginLeft: "0.5em" }}>{endIcon}</span>
+    )}
   </StyledTag>
 );
 

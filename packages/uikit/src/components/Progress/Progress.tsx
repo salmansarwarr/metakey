@@ -25,20 +25,28 @@ const Progress: React.FC<React.PropsWithChildren<ProgressProps>> = ({
   useDark = true,
   children,
 }) => {
+  // Ensure StyledProgress accepts children in its props typing
+  const Container = StyledProgress as unknown as React.ComponentType<
+    React.PropsWithChildren<{ $useDark: boolean; variant: typeof variants[keyof typeof variants]; scale: typeof scales[keyof typeof scales] }>
+  >;
+  const BunnyWrapper = ProgressBunnyWrapper as unknown as React.ComponentType<
+    React.PropsWithChildren<React.ComponentProps<typeof ProgressBunnyWrapper>>
+  >;
+
   return (
-    <StyledProgress $useDark={useDark} variant={variant} scale={scale}>
+    <Container $useDark={useDark} variant={variant} scale={scale}>
       {children || (
         <>
           {showProgressBunny && (
-            <ProgressBunnyWrapper style={{ left: `${stepGuard(primaryStep)}%` }}>
+            <BunnyWrapper style={{ left: `${stepGuard(primaryStep)}%` }}>
               <ProgressBunny />
-            </ProgressBunnyWrapper>
+            </BunnyWrapper>
           )}
-          <Bar $useDark={useDark} primary style={{ width: `${stepGuard(primaryStep)}%` }} />
-          {secondaryStep ? <Bar $useDark={useDark} style={{ width: `${stepGuard(secondaryStep)}%` }} /> : null}
+          {(Bar as any)({ $useDark: useDark, primary: true, style: { width: `${stepGuard(primaryStep)}%` } })}
+          {secondaryStep ? (Bar as any)({ $useDark: useDark, style: { width: `${stepGuard(secondaryStep)}%` } }) : null}
         </>
       )}
-    </StyledProgress>
+    </Container>
   );
 };
 

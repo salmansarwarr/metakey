@@ -14,7 +14,7 @@ const Stepper: React.FC<React.PropsWithChildren> = ({ children }) => {
     <StepperWrapper>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, { numberOfSteps });
+          return React.cloneElement(child as React.ReactElement<{ numberOfSteps?: number }>, { numberOfSteps });
         }
         return child;
       })}

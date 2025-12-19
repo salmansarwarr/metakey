@@ -27,7 +27,7 @@ const StyledInputGroup = styled(Box)<{ scale: Scales; hasStartIcon: boolean; has
   }
 `;
 
-const InputIcon = styled.div<{ scale: Scales; isEndIcon?: boolean }>`
+const InputIcon = styled.div<{ scale: Scales; isEndIcon?: boolean; children?: React.ReactNode }>`
   align-items: center;
   display: flex;
   height: 100%;

@@ -1,6 +1,16 @@
 import { StyledAnimatedIconComponent, StyledIconContainer } from "./styles";
 import { IconComponentType } from "./types";
 
+const StyledAnimatedIconComponentWithChildren =
+  StyledAnimatedIconComponent as unknown as React.ComponentType<
+    React.ComponentProps<typeof StyledAnimatedIconComponent> & { children?: React.ReactNode }
+  >;
+
+const StyledIconContainerWithChildren =
+  StyledIconContainer as unknown as React.ComponentType<
+    React.ComponentProps<typeof StyledIconContainer> & { children?: React.ReactNode }
+  >;
+
 const AnimatedIconComponent: React.FC<React.PropsWithChildren<IconComponentType>> = ({
   icon,
   fillIcon,
@@ -13,16 +23,16 @@ const AnimatedIconComponent: React.FC<React.PropsWithChildren<IconComponentType>
   const IconElement = icon;
   const IconElementFill = fillIcon;
   return IconElement ? (
-    <StyledAnimatedIconComponent isActive={isActive} hasFillIcon={!!IconElementFill} {...props}>
-      <StyledIconContainer activeBackgroundColor={activeBackgroundColor}>
+    <StyledAnimatedIconComponentWithChildren isActive={isActive} hasFillIcon={!!IconElementFill} {...props}>
+      <StyledIconContainerWithChildren activeBackgroundColor={activeBackgroundColor}>
         <IconElement color={color} />
-      </StyledIconContainer>
+      </StyledIconContainerWithChildren>
       {!!IconElementFill && (
-        <StyledIconContainer activeBackgroundColor={activeBackgroundColor} {...props}>
+        <StyledIconContainerWithChildren activeBackgroundColor={activeBackgroundColor} {...props}>
           <IconElementFill color={activeColor} />
-        </StyledIconContainer>
+        </StyledIconContainerWithChildren>
       )}
-    </StyledAnimatedIconComponent>
+    </StyledAnimatedIconComponentWithChildren>
   ) : null;
 };
 

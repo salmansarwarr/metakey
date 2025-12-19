@@ -1,6 +1,14 @@
-import { SignMessageArgs } from '@wagmi/core'
+import type { SignMessageParameters } from '@wagmi/core'
 import { useCallback } from 'react'
 import { useAccount, useSignMessage as useSignMessageWagmi } from 'wagmi'
+
+declare global {
+  interface Window {
+    BinanceChain?: {
+      bnbSign?: (address: string, message: string) => Promise<{ signature: string }>
+    }
+  }
+}
 
 export function useSignMessage() {
   const { address, connector } = useAccount()
@@ -8,7 +16,7 @@ export function useSignMessage() {
 
   return {
     signMessageAsync: useCallback(
-      async (args: SignMessageArgs) => {
+      async (args: SignMessageParameters) => {
         if (connector?.id === 'bsc' && window.BinanceChain && address) {
           const res = await window.BinanceChain.bnbSign?.(address, args.message as string)
           if (res) {

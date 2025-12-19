@@ -44,7 +44,7 @@ const AnimationWrapper = styled(Motion.div)`
   }
 `;
 
-const SkeletonWrapper = styled.div<SkeletonProps>`
+const SkeletonWrapper = styled.div<SkeletonProps & { children?: React.ReactNode }>`
   position: relative;
   ${layout}
   ${space}

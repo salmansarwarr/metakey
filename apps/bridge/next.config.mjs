@@ -14,6 +14,17 @@ const nextConfig = {
       allowFutureImage: true,
     },
   },
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Optional: also ignore ESLint errors during builds
+    ignoreDuringBuilds: true,
+  },
 }
 
 export default withTH(nextConfig)

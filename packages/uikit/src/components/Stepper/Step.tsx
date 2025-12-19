@@ -61,7 +61,7 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-export const StepNumber = styled.div<StatusProps>`
+export const StepNumber = styled.div<StatusProps & { children?: React.ReactNode }>`
   box-shadow: 0px 1px 4px rgba(25, 19, 38, 0.15);
   background-color: ${({ theme, status }) => theme.colors[status === "current" ? "secondary" : "invertedContrast"]};
   border: 2px solid ${({ theme, status }) => (status === "past" ? theme.colors.success : "transparent")};
