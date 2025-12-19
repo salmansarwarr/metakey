@@ -11,8 +11,8 @@ class MyDocument extends Document {
       // eslint-disable-next-line no-param-reassign
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />) as any,
-        })
+          enhanceApp: (App: any) => (props: any) => sheet.collectStyles(<App {...props} />),
+        } as any)
 
       const initialProps = await Document.getInitialProps(ctx)
       return {
@@ -54,7 +54,6 @@ class MyDocument extends Document {
           <Main />
           <NextScript />
           <div id="portal-root" />
-           
         </body>
       </Html>
     )
