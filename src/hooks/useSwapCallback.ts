@@ -37,6 +37,17 @@ interface SwapCallEstimate {
   call: SwapCall
 }
 
+// Helper to convert BigInt to BigNumber if needed
+function toBigNumber(value: any): BigNumber {
+  if (BigNumber.isBigNumber(value)) {
+    return value
+  }
+  if (typeof value === 'bigint') {
+    return BigNumber.from(value.toString())
+  }
+  return BigNumber.from(value)
+}
+
 // returns a function that will execute a swap, if the parameters are all valid
 // and the user has approved the slippage adjusted input amount for the trade
 export function useSwapCallback(
@@ -81,7 +92,7 @@ export function useSwapCallback(
               .then((gasEstimate) => {
                 return {
                   call,
-                  gasEstimate,
+                  gasEstimate: toBigNumber(gasEstimate),
                 }
               })
               .catch((gasError) => {
@@ -123,8 +134,8 @@ export function useSwapCallback(
 
         return contract[methodName](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
-          gasPrice,
-          ...(value && !isZero(value) ? { value, from: account } : { from: account }),
+          gasPrice: gasPrice ? toBigNumber(gasPrice) : undefined,
+          ...(value && !isZero(value) ? { value: toBigNumber(value), from: account } : { from: account }),
         })
           .then((response: any) => {
             const inputSymbol = trade.inputAmount.currency.symbol
@@ -178,7 +189,7 @@ export function useSwapCallback(
           })
           .catch((error: any) => {
             // if the user rejected the tx, pass this along
-            if (error?.code === 4001) {
+            if (error?.code === 4001 || error?.code === 'ACTION_REJECTED') {
               throw new Error('Transaction rejected.')
             } else {
               // otherwise, the error was unexpected and we need to convey that

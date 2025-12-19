@@ -48,6 +48,9 @@ export const usePollBlockNumber = () => {
 export const useCurrentBlock = (): number => {
   const { chainId } = useActiveWeb3React()
   const { data: currentBlock = 0 } = useSWRImmutable(['blockNumber', chainId])
+  if (typeof currentBlock === 'bigint') {
+    return Number(currentBlock)
+  }
   return currentBlock
 }
 

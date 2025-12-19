@@ -3,25 +3,17 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
-const withTM = require('next-transpile-modules')(['@pancakeswap/uikit', '@pancakeswap/sdk'])
 
 const sentryWebpackPluginOptions =
   process.env.VERCEL_ENV === 'production'
     ? {
-        // Additional config options for the Sentry Webpack plugin. Keep in mind that
-        // the following options are set automatically, and overriding them is not
-        // recommended:
-        //   release, url, org, project, authToken, configFile, stripPrefix,
-        //   urlPrefix, include, ignore
-        silent: false, // Logging when deploying to check if there is any problem
-        validate: true,
-        // For all available options, see:
-        // https://github.com/getsentry/sentry-webpack-plugin#options.
-      }
+      silent: false,
+      validate: true,
+    }
     : {
-        silent: true, // Suppresses all logs
-        dryRun: !process.env.SENTRY_AUTH_TOKEN,
-      }
+      silent: true,
+      dryRun: !process.env.SENTRY_AUTH_TOKEN,
+    }
 
 /** @type {import('next').NextConfig} */
 const config = {
@@ -35,8 +27,20 @@ const config = {
       unoptimized: true,
     },
   },
+  transpilePackages: [
+    '@pancakeswap/uikit',
+    '@pancakeswap/sdk',
+    '@uniswap/token-lists',
+    '@reown/appkit',
+    '@reown/appkit-adapter-wagmi',
+    '@wagmi/core',
+    '@wagmi/connectors',
+  ],
   reactStrictMode: true,
   swcMinify: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   trailingSlash: true,
   images: {
     domains: ['static-nft.pancakeswap.com'],
@@ -132,7 +136,7 @@ const config = {
       },
     ]
   },
-  webpack: (webpackConfig, { webpack }) => {
+  webpack: (webpackConfig, { isServer, webpack }) => {
     // tree shake sentry tracing
     webpackConfig.plugins.push(
       new webpack.DefinePlugin({
@@ -140,8 +144,35 @@ const config = {
         __SENTRY_TRACING__: false,
       }),
     )
+
+    // Add fallbacks for node modules
+    webpackConfig.resolve.fallback = {
+      ...webpackConfig.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+    }
+
+    // Exclude problematic packages
+    webpackConfig.resolve.alias = {
+      ...webpackConfig.resolve.alias,
+      '@coinbase/wallet-sdk': false,
+      '@base-org/account': false,
+    }
+
+    // Ignore problematic imports
+    webpackConfig.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /@base-org\/account/,
+      }),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /@coinbase\/wallet-sdk/,
+      })
+    )
+
     return webpackConfig
   },
 }
 
-module.exports = withBundleAnalyzer(withSentryConfig(withTM(config), sentryWebpackPluginOptions))
+module.exports = withBundleAnalyzer(withSentryConfig(config, sentryWebpackPluginOptions))

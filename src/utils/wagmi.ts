@@ -1,110 +1,39 @@
-import { bsc, BscConnector, CHAINS } from '@pancakeswap/wagmi'
-import { configureChains, createClient } from 'wagmi'
-import memoize from 'lodash/memoize'
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
-import { SafeConnector } from '@gnosis.pm/safe-apps-wagmi'
+import { createAppKit } from '@reown/appkit/react'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { bsc, mainnet } from '@reown/appkit/networks'
+import { QueryClient } from '@tanstack/react-query'
 
-const getNodeRealUrl = (networkName: string) => {
-  let host = null
-  switch (networkName) {
-    case 'homestead':
-      if (process.env.NEXT_PUBLIC_NODE_REAL_API_ETH) {
-        host = `eth-mainnet.nodereal.io/v1/${process.env.NEXT_PUBLIC_NODE_REAL_API_ETH}`
-      }
-      break
-    case 'rinkeby':
-      if (process.env.NEXT_PUBLIC_NODE_REAL_API_RINKEBY) {
-        host = `eth-rinkeby.nodereal.io/v1/${process.env.NEXT_PUBLIC_NODE_REAL_API_RINKEBY}`
-      }
-      break
-    case 'goerli':
-      if (process.env.NEXT_PUBLIC_NODE_REAL_API_GOERLI) {
-        host = `eth-goerli.nodereal.io/v1/${process.env.NEXT_PUBLIC_NODE_REAL_API_GOERLI}`
-      }
-      break
-    default:
-      host = null
-  }
+// 1. Get projectId from https://cloud.reown.com
+export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'fc0b7f76086b5fccf0fc5d12449e7d3e'
 
-  if (!host) {
-    return null
-  }
-
-  const url = `https://${host}`
-  return {
-    http: url,
-    webSocket: url.replace(/^http/i, 'wss').replace('.nodereal.io/v1', '.nodereal.io/ws/v1'),
-  }
+if (!projectId) {
+  throw new Error('Project ID is not defined')
 }
 
-export const { provider, chains } = configureChains(CHAINS, [
-  jsonRpcProvider({
-    rpc: (chain) => {
-      if (!!process.env.NEXT_PUBLIC_NODE_PRODUCTION && chain.id === bsc.id) {
-        return { http: process.env.NEXT_PUBLIC_NODE_PRODUCTION }
-      }
-      if (chain.rpcUrls.nodeReal) {
-        return (
-          getNodeRealUrl(chain.network) || {
-            http: chain.rpcUrls.nodeReal,
-          }
-        )
-      }
-      return { http: chain.rpcUrls.default }
-    },
-  }),
-])
+// 2. Set up Wagmi adapter
+export const networks = [bsc, mainnet]
 
-export const injectedConnector = new InjectedConnector({
-  chains,
-  options: {
-    shimDisconnect: false,
+export const wagmiAdapter = new WagmiAdapter({
+  networks,
+  projectId,
+  ssr: true,
+})
+
+// 3. Create modal
+export const modal = createAppKit({
+  adapters: [wagmiAdapter],
+  networks,
+  projectId,
+  metadata: {
+    name: 'MetaKeySwap',
+    description: 'DEX on BSC',
+    url: 'https://metakeyswap.com',
+    icons: ['https://metakeyswap.com/logo.png'],
+  },
+  features: {
+    analytics: true,
   },
 })
 
-export const coinbaseConnector = new CoinbaseWalletConnector({
-  chains,
-  options: {
-    appName: 'MetakeySwap',
-    appLogoUrl: 'https://pancakeswap.com/logo.png',
-  },
-})
-
-export const walletConnectConnector = new WalletConnectConnector({
-  chains,
-  options: {
-    qrcode: true,
-    // Better mobile support
-    bridge: 'https://bridge.walletconnect.org',
-  },
-})
-
-export const metaMaskConnector = new MetaMaskConnector({
-  chains,
-  options: {
-    shimDisconnect: false,
-  },
-})
-
-export const bscConnector = new BscConnector({ chains })
-
-export const client = createClient({
-  autoConnect: false,
-  provider,
-  connectors: [
-    new SafeConnector({ chains }),
-    metaMaskConnector,
-    injectedConnector,
-    coinbaseConnector,
-    walletConnectConnector,
-    bscConnector,
-  ],
-})
-
-const CHAIN_IDS = chains.map((c) => c.id)
-
-export const isChainSupported = memoize((chainId: number) => CHAIN_IDS.includes(chainId))
+// 4. Export config for use in providers
+export const config = wagmiAdapter.wagmiConfig

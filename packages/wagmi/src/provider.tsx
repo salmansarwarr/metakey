@@ -1,18 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers'
 import { createContext, useContext } from 'react'
 import useSWRImmutable from 'swr/immutable'
-import { useAccount, WagmiConfig, WagmiConfigProps, useNetwork } from 'wagmi'
-import { Provider, WebSocketProvider } from '@wagmi/core'
-
-export function WagmiProvider<TProvider extends Provider, TWebSocketProvider extends WebSocketProvider>(
-  props: React.PropsWithChildren<WagmiConfigProps<TProvider, TWebSocketProvider>>,
-) {
-  return (
-    <WagmiConfig client={props.client}>
-      <Web3LibraryProvider>{props.children}</Web3LibraryProvider>
-    </WagmiConfig>
-  )
-}
+import { useNetwork, WagmiConfig as WagmiConfigProvider } from 'wagmi'
+import { useAccount, usePublicClient } from 'wagmi'
 
 const Web3LibraryContext = createContext<Web3Provider | undefined>(undefined)
 
@@ -20,13 +10,31 @@ export const useWeb3LibraryContext = () => {
   return useContext(Web3LibraryContext)
 }
 
-const Web3LibraryProvider: React.FC<React.PropsWithChildren> = (props) => {
-  const { connector } = useAccount()
+export const Web3LibraryProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const { address } = useAccount()
   const { chain } = useNetwork()
-  const { data: library } = useSWRImmutable(connector && ['web3-library', connector, chain], async () => {
-    const provider = await connector?.getProvider()
-    return new Web3Provider(provider)
+  const chainId = chain?.id
+  const client = usePublicClient()
+
+  const { data: library } = useSWRImmutable(client && chainId ? ['web3-library', address, chainId] : null, async () => {
+    if (!client) return undefined
+    const { chain, transport } = client
+    const network = {
+      chainId: chain.id,
+      name: chain.name,
+      ensAddress: chain.contracts?.ensRegistry?.address,
+    }
+    const provider = new Web3Provider(transport, network)
+    return provider
   })
 
-  return <Web3LibraryContext.Provider value={library}>{props.children}</Web3LibraryContext.Provider>
+  return <Web3LibraryContext.Provider value={library}>{children}</Web3LibraryContext.Provider>
+}
+
+export function WagmiProvider({ children, config }: { children: React.ReactNode; config: any }) {
+  return (
+    <WagmiConfigProvider config={config}>
+      <Web3LibraryProvider>{children}</Web3LibraryProvider>
+    </WagmiConfigProvider>
+  )
 }

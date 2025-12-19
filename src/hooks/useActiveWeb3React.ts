@@ -2,9 +2,15 @@ import { useWeb3React } from '@pancakeswap/wagmi'
 import { useSwitchNetwork } from 'hooks/useSwitchNetwork'
 import { useRouter, NextRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { isChainSupported } from 'utils/wagmi'
-import { useProvider } from 'wagmi'
 import { useActiveChainId, useLocalNetworkChain } from './useActiveChainId'
+import { usePublicClient, useWalletClient } from 'wagmi'
+import { bsc, mainnet } from 'viem/chains'
+
+const supportedChains = [bsc, mainnet]
+
+function isChainSupported(chainId: number) {
+  return supportedChains.some(chain => chain.id === chainId)
+}
 
 const getHashFromRouter = (router: NextRouter) => {
   return router.asPath.match(/#([a-z0-9]+)/gi)
@@ -21,6 +27,7 @@ export function useNetworkConnectorUpdater() {
   useEffect(() => {
     if (isLoading || !router.isReady || isConnecting) return
     const parsedQueryChainId = Number(router.query.chainId)
+    
     if (triedSwitchFromQuery) {
       if (parsedQueryChainId !== chainId && isChainSupported(chainId)) {
         const uriHash = getHashFromRouter(router)?.[0]
@@ -37,12 +44,8 @@ export function useNetworkConnectorUpdater() {
       }
     } else if (isChainSupported(parsedQueryChainId)) {
       switchNetwork(parsedQueryChainId)
-        .then((r) => {
-          console.info('Auto switch network', r)
-        })
-        .catch((err) => {
-          console.error(err)
-        })
+        .then((r) => console.info('Auto switch network', r))
+        .catch((err) => console.error(err))
         .finally(() => setTriedSwitchFromQuery(true))
     } else {
       setTriedSwitchFromQuery(true)
@@ -56,17 +59,15 @@ export function useNetworkConnectorUpdater() {
   }
 }
 
-/**
- * Provides a web3 provider with or without user's signer
- * Recreate web3 instance only if the provider change
- */
 const useActiveWeb3React = () => {
   const web3React = useWeb3React()
   const chainId = useActiveChainId()
-  const provider = useProvider({ chainId })
+  const publicClient = usePublicClient({ chainId })
+  const { data: walletClient } = useWalletClient({ chainId })
 
   return {
-    provider,
+    provider: publicClient,
+    signer: walletClient,
     ...web3React,
     chainId,
   }

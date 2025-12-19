@@ -7,9 +7,12 @@ import { ToastsProvider } from 'contexts/ToastsContext'
 import { fetchStatusMiddleware } from 'hooks/useSWRContract'
 import { Store } from '@reduxjs/toolkit'
 import { ThemeProvider as NextThemeProvider, useTheme as useNextTheme } from 'next-themes'
-import { WagmiProvider } from '@pancakeswap/wagmi'
-import { client } from 'utils/wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiProvider } from 'wagmi'
+import { config } from 'utils/wagmi'
 import { HistoryManagerProvider } from 'contexts/HistoryContext'
+
+const queryClient = new QueryClient()
 
 const StyledThemeProvider: React.FC<React.PropsWithChildren> = ({ children, ...props }) => {
   const { resolvedTheme } = useNextTheme()
@@ -25,28 +28,30 @@ const Providers: React.FC<React.PropsWithChildren<{ store: Store; children: Reac
   store,
 }) => {
   return (
-    <WagmiProvider client={client}>
-      <Provider store={store}>
-        <MatchBreakpointsProvider>
-          <ToastsProvider>
-            <NextThemeProvider>
-              <StyledThemeProvider>
-                <LanguageProvider>
-                  <SWRConfig
-                    value={{
-                      use: [fetchStatusMiddleware],
-                    }}
-                  >
-                    <HistoryManagerProvider>
-                      <ModalProvider>{children}</ModalProvider>
-                    </HistoryManagerProvider>
-                  </SWRConfig>
-                </LanguageProvider>
-              </StyledThemeProvider>
-            </NextThemeProvider>
-          </ToastsProvider>
-        </MatchBreakpointsProvider>
-      </Provider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <MatchBreakpointsProvider>
+            <ToastsProvider>
+              <NextThemeProvider>
+                <StyledThemeProvider>
+                  <LanguageProvider>
+                    <SWRConfig
+                      value={{
+                        use: [fetchStatusMiddleware],
+                      }}
+                    >
+                      <HistoryManagerProvider>
+                        <ModalProvider>{children}</ModalProvider>
+                      </HistoryManagerProvider>
+                    </SWRConfig>
+                  </LanguageProvider>
+                </StyledThemeProvider>
+              </NextThemeProvider>
+            </ToastsProvider>
+          </MatchBreakpointsProvider>
+        </Provider>
+      </QueryClientProvider>
     </WagmiProvider>
   )
 }

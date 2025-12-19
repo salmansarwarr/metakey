@@ -9,7 +9,7 @@ import { bsc } from '@pancakeswap/wagmi'
 import memoize from 'lodash/memoize'
 import { TokenAddressMap } from 'state/types'
 import { BASE_BSC_SCAN_URLS } from '../config'
-import { chains } from './wagmi'
+import { useChains } from 'wagmi'
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export const isAddress = memoize((value: any): string | false => {
@@ -25,6 +25,7 @@ export function getBlockExploreLink(
   type: 'transaction' | 'token' | 'address' | 'block' | 'countdown',
   chainIdOverride?: number,
 ): string {
+  const chains = useChains();
   const chainId = chainIdOverride || ChainId.BSC
   const chain = chains.find((c) => c.id === chainId)
   if (!chain) return bsc.blockExplorers.default.url
@@ -48,6 +49,7 @@ export function getBlockExploreLink(
 }
 
 export function getBlockExploreName(chainIdOverride?: number) {
+  const chains = useChains();
   const chainId = chainIdOverride || ChainId.BSC
   const chain = chains.find((c) => c.id === chainId)
 

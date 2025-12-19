@@ -6,7 +6,7 @@ import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from 'config/constants/exchange'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { useFeeData } from 'wagmi'
+import { useGasPrice as useWagmiGasPrice } from 'wagmi'
 import { useOfficialsAndUserAddedTokens } from 'hooks/Tokens'
 import { AppState, useAppDispatch } from '../../index'
 import {
@@ -404,7 +404,7 @@ export function useRemoveUserAddedToken(): (chainId: number, address: string) =>
 export function useGasPrice(): string {
   const { chainId, chain } = useActiveWeb3React()
   const userGas = useSelector<AppState, AppState['user']['gasPrice']>((state) => state.user.gasPrice)
-  const { data } = useFeeData({
+  const { data } = useWagmiGasPrice({
     chainId,
     enabled: chainId !== ChainId.BSC && chainId !== ChainId.BSC_TESTNET,
     watch: true,
@@ -416,9 +416,9 @@ export function useGasPrice(): string {
     return GAS_PRICE_GWEI.testnet
   }
   if (chain?.testnet) {
-    return data?.formatted?.maxPriorityFeePerGas
+    return data?.toString()
   }
-  return data?.formatted?.gasPrice
+  return data?.toString()
 }
 
 export function useGasPriceManager(): [string, (userGasPrice: string) => void] {

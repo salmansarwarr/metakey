@@ -1,4 +1,5 @@
 import { Currency, CurrencyAmount, Fraction, JSBI, Percent, Trade, TradeType } from '@pancakeswap/sdk'
+import { Contract } from '@ethersproject/contracts'
 import IPancakeRouter02ABI from 'config/abi/IPancakeRouter02.json'
 import { IPancakeRouter02 } from 'config/abi/types/IPancakeRouter02'
 import {
@@ -12,7 +13,8 @@ import {
   ROUTER_ADDRESS,
 } from 'config/constants/exchange'
 import { useActiveChainId } from 'hooks/useActiveChainId'
-import { useContract } from 'hooks/useContract'
+import { useProviderOrSigner } from 'hooks/useProviderOrSigner'
+import { useMemo } from 'react'
 import { Field } from '../state/swap/actions'
 
 // converts a basis points value to a sdk percent
@@ -30,9 +32,30 @@ export function calculateSlippageAmount(value: CurrencyAmount<Currency>, slippag
   ]
 }
 
-export function useRouterContract() {
+// Returns ethers Contract for PancakeSwap Router
+export function useRouterContract(): Contract | null {
   const chainId = useActiveChainId()
-  return useContract<IPancakeRouter02>(ROUTER_ADDRESS[chainId], IPancakeRouter02ABI, true)
+  const providerOrSigner = useProviderOrSigner(true)
+
+  return useMemo(() => {
+    if (!chainId || !providerOrSigner) {
+      console.log('Router contract dependencies missing:', { chainId, hasProvider: !!providerOrSigner })
+      return null
+    }
+
+    const routerAddress = ROUTER_ADDRESS[chainId]
+    if (!routerAddress) {
+      console.error('No router address for chainId:', chainId)
+      return null
+    }
+
+    try {
+      return new Contract(routerAddress, IPancakeRouter02ABI, providerOrSigner) as IPancakeRouter02
+    } catch (error) {
+      console.error('Failed to create router contract:', error)
+      return null
+    }
+  }, [chainId, providerOrSigner])
 }
 
 // computes price breakdown for the trade

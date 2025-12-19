@@ -4,8 +4,10 @@ import useActiveWeb3React, { useNetworkConnectorUpdater } from 'hooks/useActiveW
 import { useTranslation } from '@pancakeswap/localization'
 import Image from 'next/image'
 import { useMemo } from 'react'
-import { chains } from 'utils/wagmi'
 import { WrongNetworkModal } from './WrongNetworkModal'
+import { bsc, mainnet } from 'viem/chains'
+
+const chains = [bsc, mainnet];
 
 export const NetworkSelect = ({ switchNetwork }) => {
   const { t } = useTranslation()

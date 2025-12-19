@@ -34,7 +34,6 @@ async function fetchChunk(
   let resultsBlockNumber
   let returnData
   try {
-    // prettier-ignore
     [resultsBlockNumber, , returnData] = await multicallContract.callStatic.tryBlockAndAggregate(
       false,
       chunk.map((obj) => ({
@@ -72,10 +71,24 @@ async function fetchChunk(
     console.debug('Failed to fetch chunk inside retry', error)
     throw error
   }
-  if (resultsBlockNumber?.toNumber() < minBlockNumber) {
-    console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
+  
+  // Convert BigInt to number - handle multiple possible formats
+  let blockNumber: number
+  if (typeof resultsBlockNumber === 'bigint') {
+    blockNumber = Number(resultsBlockNumber)
+  } else if (resultsBlockNumber?.toNumber && typeof resultsBlockNumber.toNumber === 'function') {
+    blockNumber = resultsBlockNumber.toNumber()
+  } else if (typeof resultsBlockNumber === 'number') {
+    blockNumber = resultsBlockNumber
+  } else {
+    blockNumber = Number(resultsBlockNumber)
   }
-  return { results: returnData, blockNumber: resultsBlockNumber?.toNumber() }
+  
+  if (blockNumber < minBlockNumber) {
+    console.debug(`Fetched results for old block number: ${blockNumber} vs. ${minBlockNumber}`)
+  }
+  
+  return { results: returnData, blockNumber }
 }
 
 /**
@@ -133,7 +146,9 @@ export function outdatedListeningKeys(
     // no data, must fetch
     if (!data) return true
 
-    const minDataBlockNumber = currentBlock - (blocksPerFetch - 1)
+    // Convert currentBlock to number if it's BigInt
+    const currentBlockNum = typeof currentBlock === 'bigint' ? Number(currentBlock) : currentBlock
+    const minDataBlockNumber = currentBlockNum - (blocksPerFetch - 1)
 
     // already fetching it for a recent enough block, don't refetch it
     if (data.fetchingBlockNumber && data.fetchingBlockNumber >= minDataBlockNumber) return false
@@ -142,7 +157,6 @@ export function outdatedListeningKeys(
     return !data.blockNumber || data.blockNumber < minDataBlockNumber
   })
 }
-
 export default function Updater(): null {
   const dispatch = useAppDispatch()
   const state = useSelector<AppState, AppState['multicall']>((s) => s.multicall)
@@ -233,7 +247,9 @@ export default function Updater(): null {
                 errorFetchingMulticallResults({
                   calls: erroredCalls,
                   chainId,
-                  fetchingBlockNumber: fetchBlockNumber,
+                  fetchingBlockNumber: typeof fetchBlockNumber === 'bigint' 
+                    ? Number(fetchBlockNumber) 
+                    : fetchBlockNumber,
                 }),
               )
             }
@@ -245,10 +261,12 @@ export default function Updater(): null {
             }
             console.error('Failed to fetch multicall chunk', chunk, chainId, error, currentBlock)
             dispatch(
-              errorFetchingMulticallResults({
-                calls: chunk,
+              fetchingMulticallResults({
+                calls,
                 chainId,
-                fetchingBlockNumber: currentBlock,
+                fetchingBlockNumber: typeof currentBlock === 'bigint' 
+                  ? Number(currentBlock) 
+                  : currentBlock,
               }),
             )
           })

@@ -9,7 +9,7 @@ import { CAKE } from 'config/constants/tokens'
 // Addresses
 import {
   getAddress,
-  getPancakeProfileAddress,
+  getPancakeProfileAddress, 
   getPancakeBunniesAddress,
   getBunnyFactoryAddress,
   getBunnySpecialAddress,

@@ -6,13 +6,28 @@
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "es2020",
     "paths": {
-      "@pancakeswap/sdk": ["../packages/swap-sdk/src/index.ts"],
-      "@pancakeswap/wagmi": ["../packages/wagmi/src/index.ts"],
-      "@pancakeswap/hooks": ["../packages/hooks/src/index.ts"]
-    }
+      "@pancakeswap/sdk": [
+        "../packages/swap-sdk/src/index.ts"
+      ],
+      "@pancakeswap/wagmi": [
+        "../packages/wagmi/src/index.ts"
+      ],
+      "@pancakeswap/hooks": [
+        "../packages/hooks/src/index.ts"
+      ]
+    },
+    "skipLibCheck": true
   },
-  "exclude": ["node_modules", "cypress", "/apps/*"],
-  "include": ["next-env.d.ts", "./src/**/*.ts", "./src/**/*.tsx"]
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "/apps/*"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ]
 }

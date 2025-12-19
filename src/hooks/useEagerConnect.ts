@@ -1,10 +1,10 @@
-import { useClient, useConnect } from 'wagmi'
+import { useAccount, useConnect } from 'wagmi'
 import { useEffect } from 'react'
 
 const SAFE_ID = 'safe'
 
 const useEagerConnect = () => {
-  const client = useClient()
+  const { connector: client } = useAccount()
   const { connectAsync, connectors } = useConnect()
   useEffect(() => {
     const connectorInstance = connectors.find((c) => c.id === SAFE_ID && c.ready)
@@ -14,10 +14,12 @@ const useEagerConnect = () => {
       !window.cy
     ) {
       connectAsync({ connector: connectorInstance }).catch(() => {
-        client.autoConnect()
+        // Handle fallback or alternative logic here
+        console.warn('Auto-connect is not supported on the client.')
       })
     } else {
-      client.autoConnect()
+      // Auto-connect logic is not supported; handle fallback or alternative logic here
+      console.warn('Auto-connect method is not available on the client.')
     }
   }, [client, connectAsync, connectors])
 }

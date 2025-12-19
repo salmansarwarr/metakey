@@ -59,10 +59,28 @@ import {
   getTradingCompetitionContractMoD,
   getPresaleContract,
 } from 'utils/contractHelpers'
-import { useSigner } from 'wagmi'
+import { usePublicClient, useWalletClient } from 'wagmi'
+import { useMemo as useWagmiMemo } from 'react'
+import { providers, Contract } from 'ethers'
+
+function useSigner() {
+  const { data: walletClient } = useWalletClient()
+  return {
+    data: useWagmiMemo(() => {
+      if (!walletClient) return undefined
+      const { account, chain, transport } = walletClient
+      const network = {
+        chainId: chain.id,
+        name: chain.name,
+        ensAddress: chain.contracts?.ensRegistry?.address,
+      }
+      const provider = new providers.Web3Provider(transport as any, network)
+      return provider.getSigner(account.address)
+    }, [walletClient]),
+  }
+}
 
 // Imports below migrated from Exchange useContract.ts
-import { Contract } from '@ethersproject/contracts'
 import { WNATIVE } from '@pancakeswap/sdk'
 import { ERC20_BYTES32_ABI } from '../config/abi/erc20'
 import ERC20_ABI from '../config/abi/erc20.json'
@@ -73,6 +91,7 @@ import { getContract } from '../utils'
 
 import { IPancakePair } from '../config/abi/types/IPancakePair'
 import { VaultKey } from '../state/types'
+import { useActiveChainId } from './useActiveChainId'
 
 /**
  * Helper hooks to get specific contracts (by ABI)
@@ -286,49 +305,90 @@ export const useErc721CollectionContract = (
 }
 
 // Code below migrated from Exchange useContract.ts
+// Ethers-based contract hooks for compatibility with existing code
 
-// returns null on errors
-export function useContract<T extends Contract = Contract>(
-  address: string | undefined,
-  ABI: any,
-  withSignerIfPossible = true,
-): T | null {
-  const { provider } = useActiveWeb3React()
-  const providerOrSigner = useProviderOrSigner(withSignerIfPossible) ?? provider
-
-  const canReturnContract = useMemo(() => address && ABI && providerOrSigner, [address, ABI, providerOrSigner])
+export function useTokenContract(tokenAddress?: string, withSignerIfPossible = true): Contract | null {
+  const providerOrSigner = useProviderOrSigner(withSignerIfPossible)
 
   return useMemo(() => {
-    if (!canReturnContract) return null
+    if (!tokenAddress || !providerOrSigner) return null
+
     try {
-      return getContract(address, ABI, providerOrSigner)
+      return new Contract(tokenAddress, ERC20_ABI, providerOrSigner)
     } catch (error) {
-      console.error('Failed to get contract', error)
+      console.error('Failed to get token contract:', error)
       return null
     }
-  }, [address, ABI, providerOrSigner, canReturnContract]) as T
+  }, [tokenAddress, providerOrSigner])
 }
 
-export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean) {
-  return useContract<Erc20>(tokenAddress, ERC20_ABI, withSignerIfPossible)
-}
-
-export function useWNativeContract(withSignerIfPossible?: boolean): Contract | null {
+export function useWNativeContract(withSignerIfPossible = true): Contract | null {
   const { chainId } = useActiveWeb3React()
-  return useContract<Weth>(chainId ? WNATIVE[chainId]?.address : undefined, WETH_ABI, withSignerIfPossible)
+  const providerOrSigner = useProviderOrSigner(withSignerIfPossible)
+
+  return useMemo(() => {
+    if (!chainId || !providerOrSigner) return null
+    
+    const address = WNATIVE[chainId]?.address
+    if (!address) return null
+
+    try {
+      return new Contract(address, WETH_ABI, providerOrSigner)
+    } catch (error) {
+      console.error('Failed to get WNATIVE contract:', error)
+      return null
+    }
+  }, [chainId, providerOrSigner])
 }
 
-export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract<Erc20Bytes32>(tokenAddress, ERC20_BYTES32_ABI, withSignerIfPossible)
+export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossible = true): Contract | null {
+  const providerOrSigner = useProviderOrSigner(withSignerIfPossible)
+
+  return useMemo(() => {
+    if (!tokenAddress || !providerOrSigner) return null
+
+    try {
+      return new Contract(tokenAddress, ERC20_BYTES32_ABI, providerOrSigner)
+    } catch (error) {
+      console.error('Failed to get bytes32 token contract:', error)
+      return null
+    }
+  }, [tokenAddress, providerOrSigner])
 }
 
-export function usePairContract(pairAddress?: string, withSignerIfPossible?: boolean): IPancakePair | null {
-  return useContract(pairAddress, IPancakePairABI, withSignerIfPossible)
+export function usePairContract(pairAddress?: string, withSignerIfPossible = true): Contract | null {
+  const providerOrSigner = useProviderOrSigner(withSignerIfPossible)
+
+  return useMemo(() => {
+    if (!pairAddress || !providerOrSigner) return null
+
+    try {
+      return new Contract(pairAddress, IPancakePairABI, providerOrSigner)
+    } catch (error) {
+      console.error('Failed to get pair contract:', error)
+      return null
+    }
+  }, [pairAddress, providerOrSigner])
 }
 
-export function useMulticallContract() {
+// Ethers version for Multicall Updater (legacy)
+export function useMulticallContract(): Contract | null {
   const { chainId } = useActiveWeb3React()
-  return useContract<Multicall>(getMulticallAddress(chainId), multiCallAbi, false)
+  const providerOrSigner = useProviderOrSigner(false)
+  
+  return useMemo(() => {
+    const address = getMulticallAddress(chainId)
+    if (!address || !providerOrSigner) {
+      return null
+    }
+    
+    try {
+      return new Contract(address, multiCallAbi, providerOrSigner)
+    } catch (error) {
+      console.error('Failed to get multicall contract:', error)
+      return null
+    }
+  }, [chainId, providerOrSigner])
 }
 
 export const usePotterytVaultContract = (address) => {
@@ -341,8 +401,20 @@ export const usePotterytDrawContract = () => {
   return useMemo(() => getPotteryDrawContract(signer), [signer])
 }
 
-export function useZapContract(withSignerIfPossible = true) {
-  return useContract<Zap>(getZapAddress(), zapAbi, withSignerIfPossible)
+export function useZapContract(withSignerIfPossible = true): Contract | null {
+  const providerOrSigner = useProviderOrSigner(withSignerIfPossible)
+  
+  return useMemo(() => {
+    const address = getZapAddress()
+    if (!address || !providerOrSigner) return null
+
+    try {
+      return new Contract(address, zapAbi, providerOrSigner)
+    } catch (error) {
+      console.error('Failed to get zap contract:', error)
+      return null
+    }
+  }, [providerOrSigner])
 }
 
 export function useBCakeFarmBoosterContract(withSignerIfPossible = true) {
@@ -366,7 +438,4 @@ export function useBCakeProxyContract(proxyContractAddress: string, withSignerIf
 export const usePresale = () => {
   const { data: signer } = useSigner()
   return useMemo(() => getPresaleContract(signer), [signer])
-  // const { library } = useActiveWeb3React()
-  // console.log(library)
-  // return useMemo(() => getPresaleContract(library.getSigner()), [library])
 }

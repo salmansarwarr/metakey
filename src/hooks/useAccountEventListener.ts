@@ -17,12 +17,17 @@ export const useAccountEventListener = () => {
         clearUserStates(dispatch, chainId, true)
       }
 
-      connector.addListener('disconnect', handleDeactiveEvent)
-      connector.addListener('change', handleUpdateEvent)
+      const provider = connector.provider as any
+      if (provider?.on) {
+        provider.on('disconnect', handleDeactiveEvent)
+        provider.on('chainChanged', handleUpdateEvent)
+        provider.on('accountsChanged', handleUpdateEvent)
 
-      return () => {
-        connector.removeListener('disconnect', handleDeactiveEvent)
-        connector.removeListener('change', handleUpdateEvent)
+        return () => {
+          provider.removeListener('disconnect', handleDeactiveEvent)
+          provider.removeListener('chainChanged', handleUpdateEvent)
+          provider.removeListener('accountsChanged', handleUpdateEvent)
+        }
       }
     }
     return undefined
